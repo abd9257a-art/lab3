@@ -12,6 +12,14 @@ def train_linear_regression(data: RegressionInput) -> RegressionResult:
     y_train = np.asarray(data.train_target, dtype=float).reshape(-1)
     X_test = np.asarray(data.test_features, dtype=float)
 
+    # Feature scaling
+    mean = np.mean(X_train, axis=0)
+    std = np.std(X_train, axis=0)
+    std[std == 0] = 1
+
+    X_train = (X_train - mean) / std
+    X_test = (X_test - mean) / std
+
     weights = np.zeros(X_train.shape[1])
     bias = 0.0
     loss_history = []

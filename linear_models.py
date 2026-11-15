@@ -5,11 +5,39 @@ from grader_contracts.linear_models import (
     RegressionInput,
     RegressionResult,
 )
-
+import numpy as np
 
 def train_linear_regression(data: RegressionInput) -> RegressionResult:
-    """Обучите собственную линейную регрессию на train и верните прогноз для test."""
-    raise NotImplementedError
+    X_train = np.asarray(data.train_features, dtype=float)
+    y_train = np.asarray(data.train_target, dtype=float).reshape(-1)
+    X_test = np.asarray(data.test_features, dtype=float)
+
+    weights = np.zeros(X_train.shape[1])
+    bias = 0.0
+    loss_history = []
+
+    for epoch in range(data.epochs):
+        predictions = X_train @ weights + bias
+        errors = predictions - y_train
+
+        dw = (2 / len(y_train)) * (X_train.T @ errors)
+        db = (2 / len(y_train)) * np.sum(errors)
+
+        weights -= data.learning_rate * dw
+        bias -= data.learning_rate * db
+
+        updated_predictions = X_train @ weights + bias
+        mse = np.mean((updated_predictions - y_train) ** 2)
+        loss_history.append(float(mse))
+
+    test_predictions = X_test @ weights + bias
+
+    return RegressionResult(
+        weights=weights,
+        bias=float(bias),
+        loss_history=loss_history,
+        predictions=test_predictions
+    )
 
 
 def train_logistic_classifier(data: ClassificationInput) -> ClassificationResult:
